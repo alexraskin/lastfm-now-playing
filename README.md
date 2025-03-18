@@ -1,8 +1,11 @@
-# Last.fm Recent Tracks API
+# Last.fm Now Playing
 
 A simple API that fetches the currently playing or most recently played track from Last.fm for a given user.
 
 ## Try it out:
+
+[![Last.FM Last Played Song](https://img.shields.io/endpoint?color=purple&url=https://playing.alexraskin.com/twizycat?format=shields.io)](https://github.com/alexraskin/lastfm-now-playing)
+
 
 ```bash
 curl -s https://playing.alexraskin.com/{your lastfm username}
@@ -68,22 +71,9 @@ GET /twizycat
 
 #### Shields.io format:
 
-Add `?format=shields.io` to get a response compatible with Shields.io dynamic badges:
-
 ```
 GET /twizycat?format=shields.io
 ```
-
-Response:
-```json
-{
-  "schemaVersion": 1,
-  "label": "Currently Playing",
-  "message": "Artist Name - Track Name",
-  "color": "green"
-}
 ```
-
-## License
-
-MIT 
+[![Last.FM Last Played Song](https://img.shields.io/endpoint?color=blueviolet&url=https://playing.alexraskin.com/twizycat?format=shields.io)](https://github.com/alexraskin/lastfm-now-playing)
+```
