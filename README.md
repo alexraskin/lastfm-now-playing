@@ -17,11 +17,21 @@ curl -s https://playing.alexraskin.com/{your lastfm username}
 ### Local Dev
 
 1. Clone this repository
+   ```
+   git clone https://github.com/alexraskin/lastfm-now-playing.git
+   ```
+
 2. Install dependencies:
    ```
    go mod download
    ```
-3. Run the application:
+
+3. Set the `LASTFM_API_KEY` environment variable:
+   ```
+   export LASTFM_API_KEY={your lastfm api key}
+   ```
+
+4. Run the application:
    ```
    go run main.go
    ```

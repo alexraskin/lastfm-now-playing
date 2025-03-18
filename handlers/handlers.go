@@ -50,8 +50,8 @@ func NowPlayingHandler(c *fiber.Ctx, lfmclient *service.LastFMService) error {
 		message := fmt.Sprintf("%s - %s", track.Name, track.Artist)
 		label := "Currently Playing"
 		if !track.NowPlaying {
-			message = fmt.Sprintf("Last played %s", track.PlayedAt)
 			label = "Last Played"
+			message = fmt.Sprintf("%s - %s", track.Name, track.Artist)
 		}
 
 		return c.Status(fiber.StatusOK).JSON(models.ShieldsResponse{
