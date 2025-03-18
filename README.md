@@ -13,12 +13,10 @@ curl -s https://playing.alexraskin.com/{your lastfm username}
 
 ## Setup
 
-### Prerequisites
-
 - Go 1.24 or later
 - Last.fm API key (get one from [Last.fm API](https://www.last.fm/api/))
 
-### Local Development
+### Local Dev
 
 1. Clone this repository
 2. Install dependencies:
@@ -30,18 +28,18 @@ curl -s https://playing.alexraskin.com/{your lastfm username}
    go run main.go
    ```
 
-### Using Docker
+### Docker
 
 1. Build the Docker image:
    ```
-   docker build -t lastfm-api .
+   docker build -t lastfm-now-playing .
    ```
 2. Run the container:
    ```
-   docker run -p 3000:3000 lastfm-api
+   docker run -p 3000:3000 -e LASTFM_API_KEY={your lastfm api key} lastfm-now-playing
    ```
 
-## API Usage
+## Usage
 
 ### Get a user's currently playing track
 
@@ -69,7 +67,7 @@ GET /twizycat
 }
 ```
 
-#### Shields.io format:
+#### Shields.io Format:
 
 ```
 GET /twizycat?format=shields.io

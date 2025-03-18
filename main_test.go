@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/alexraskin/lastfm-now-playing/models"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,7 +17,7 @@ func TestTrackResponseJSON(t *testing.T) {
 	app := fiber.New()
 
 	app.Get("/test", func(c *fiber.Ctx) error {
-		track := Track{
+		track := models.Track{
 			Artist:     "Test Artist",
 			Name:       "Test Track",
 			Album:      "Test Album",
