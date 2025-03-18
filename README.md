@@ -5,7 +5,7 @@ A simple API that fetches the currently playing or most recently played track fr
 ## Try it out:
 
 ```bash
-curl -s https://playing.alexraskin.com/{your lastfm username}
+curl -s https://lastfm-now-playing-production.up.railway.app/{your lastfm username}
 ```
 
 ## Setup
