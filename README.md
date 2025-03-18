@@ -2,8 +2,6 @@
 
 A simple API that fetches the currently playing or most recently played track from Last.fm for a given user.
 
-## Try it out:
-
 [![Last.FM Last Played Song](https://img.shields.io/endpoint?color=purple&url=https://playing.alexraskin.com/twizycat?format=shields.io)](https://github.com/alexraskin/lastfm-now-playing)
 
 
@@ -38,8 +36,6 @@ curl -s https://playing.alexraskin.com/{your lastfm username}
    ```
    docker run -p 3000:3000 -e LASTFM_API_KEY={your lastfm api key} lastfm-now-playing
    ```
-
-## Usage
 
 ### Get a user's currently playing track
 
