@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/shkh/lastfm-go/lastfm"
 )
 
@@ -72,6 +73,12 @@ func main() {
 		ServerHeader: "Last.FM Recent",
 		JSONEncoder:  CustomJSONEncoder,
 	})
+
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+		AllowHeaders: "Origin, Content-Type, Accept",
+		AllowMethods: "GET, OPTIONS",
+	}))
 
 	app.Get("/:user", func(c *fiber.Ctx) error {
 		return indexHandler(c, client)
