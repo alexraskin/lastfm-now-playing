@@ -2,11 +2,11 @@
 
 A simple API that fetches the currently playing or most recently played track from Last.fm for a given user.
 
-[![Last.FM Last Played Song](https://img.shields.io/endpoint?color=purple&url=https://playing.alexraskin.com/twizycat?format=shields.io)](https://github.com/alexraskin/lastfm-now-playing)
+[![Last.FM Last Played Song](https://img.shields.io/endpoint?color=purple&url=https://lastfm.alexraskin.com/twizycat?format=shields.io)](https://github.com/alexraskin/lastfm-now-playing)
 
 
 ```bash
-curl -s https://playing.alexraskin.com/{your lastfm username}
+curl -s https://lastfm.alexraskin.com/{your lastfm username}
 ```
 
 ## Setup
