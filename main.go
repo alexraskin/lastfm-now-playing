@@ -69,7 +69,6 @@ func main() {
 			default:
 				clientIP = fallbackIP
 			}
-			log.Println("clientIP", clientIP)
 			return clientIP
 		},
 		LimitReached: func(c *fiber.Ctx) error {
