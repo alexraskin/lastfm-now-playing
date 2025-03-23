@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/alexraskin/lastfm-now-playing/handlers"
@@ -53,7 +54,23 @@ func main() {
 		Max:        config.RateLimit,
 		Expiration: config.RateLimitTime,
 		KeyGenerator: func(c *fiber.Ctx) string {
-			return c.IP()
+			cfIP := c.Get("CF-Connecting-IP")
+			realIP := c.Get("X-Real-IP")
+			forwardedFor := c.Get("X-Forwarded-For")
+			fallbackIP := c.IP()
+			var clientIP string
+			switch {
+			case cfIP != "":
+				clientIP = cfIP
+			case realIP != "":
+				clientIP = realIP
+			case forwardedFor != "":
+				clientIP = strings.Split(forwardedFor, ",")[0] // take the first IP in the chain
+			default:
+				clientIP = fallbackIP
+			}
+			log.Println("clientIP", clientIP)
+			return clientIP
 		},
 		LimitReached: func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
