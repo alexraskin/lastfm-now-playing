@@ -88,7 +88,7 @@ func main() {
 		return handlers.NowPlayingHandler(c, client)
 	})
 
-	app.Get("/widget/:user", func(c *fiber.Ctx) error {
+	app.Get("/widget/", func(c *fiber.Ctx) error {
 		return handlers.NowPlayingWidgetHandler(c, client)
 	})
 
