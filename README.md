@@ -92,4 +92,5 @@ GET /widget/twizycat
   url: https://lastfm.alexraskin.com/widget/twizycat
   allow-potentially-dangerous-html: true
   cache: 30s
+  frameless: true
 ```
