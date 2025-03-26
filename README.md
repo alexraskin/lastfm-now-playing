@@ -81,3 +81,15 @@ GET /twizycat?format=shields.io
 ```
 [![Last.FM Last Played Song](https://img.shields.io/endpoint?color=blueviolet&url=https://playing.alexraskin.com/twizycat?format=shields.io)](https://github.com/alexraskin/lastfm-now-playing)
 ```
+
+#### Glance Widget Format:
+
+```
+GET /widget/twizycat
+```
+```yaml
+- type: extension
+  url: https://lastfm.alexraskin.com/widget/twizycat
+  allow-potentially-dangerous-html: true
+  cache: 30s
+```

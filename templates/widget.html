@@ -1,18 +1,25 @@
-{{ if .NowPlaying }}
-  <div>
-    <strong>🎵 Now Playing:</strong> {{ .Name }}<br>
-    👤 {{ .Artist }}<br>
-    💿 {{ .Album }}
-  </div>
-{{ else }}
-  <div>
-    <strong>🕒 Last Played:</strong> {{ .Name }}<br>
-    👤 {{ .Artist }}<br>
-    💿 {{ .Album }}<br>
-    📅 {{ .PlayedAt }}
-  </div>
-{{ end }}
+<div class="widget-content-frame flex flex-row justify-start items-center gap-20">
 
-{{ if .ImageURL }}
-  <img src="{{ .ImageURL }}" loading="lazy" alt="Album Cover" style="max-width: 100%;">
-{{ end }}
+  {{ if .ImageURL }}
+    <div>
+      <img src="{{ .ImageURL }}" alt="Album Cover"
+           loading="lazy"
+           class="card"
+           style="border-radius: 5px; min-width: 8rem; max-width: 8rem;">
+    </div>
+  {{ end }}
+
+  <div class="flex grow flex-column justify-center" style="padding-right: 1rem">
+    {{ if .NowPlaying }}
+      <div class="color-positive size-h4">🎵 {{ .Name }}</div>
+      <div class="size-h4">{{ .Artist }}</div>
+      <div class="size-caption color-dimmed">{{ .Album }}</div>
+    {{ else }}
+      <div class="color-warning size-h4">🕒 {{ .Name }}</div>
+      <div class="size-h4">{{ .Artist }}</div>
+      <div class="size-caption color-dimmed">{{ .Album }}</div>
+      <div class="size-caption">📅 {{ .PlayedAt }}</div>
+    {{ end }}
+  </div>
+
+</div>
