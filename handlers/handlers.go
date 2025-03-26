@@ -115,6 +115,8 @@ func NowPlayingWidgetHandler(c *fiber.Ctx, lfmclient *service.LastFMService) err
 		return c.Status(fiber.StatusInternalServerError).SendString("Render error: " + err.Error())
 	}
 
+	c.Set("Widget-Title", "Now Playing")
+	c.Set("Widget-Content-Type", "html")
 	c.Type("html", "utf-8")
 	return c.Send(out.Bytes())
 }
