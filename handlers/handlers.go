@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"bytes"
 	"fmt"
+	"html/template"
 
 	"github.com/alexraskin/lastfm-now-playing/models"
 	"github.com/alexraskin/lastfm-now-playing/service"
@@ -22,6 +24,11 @@ func IndexHandler(c *fiber.Ctx) error {
 				Method:      "GET",
 				Path:        "/:user/?format=shields.io",
 				Description: "Get the currently playing track for a user in Shields.io format",
+			},
+			{
+				Method:      "GET",
+				Path:        "/widget/:user",
+				Description: "Get the currently playing track that supports Glance Widgets",
 			},
 		},
 	}
@@ -66,6 +73,48 @@ func NowPlayingHandler(c *fiber.Ctx, lfmclient *service.LastFMService) error {
 		Artist:     track.Artist,
 		Album:      track.Album,
 		NowPlaying: track.NowPlaying,
+		Images:     track.Images,
 		PlayedAt:   track.PlayedAt,
 	})
+}
+
+func NowPlayingWidgetHandler(c *fiber.Ctx, lfmclient *service.LastFMService) error {
+	user := c.Params("user")
+	if user == "" {
+		return c.Status(fiber.StatusBadRequest).SendString("Missing 'user' parameter")
+	}
+
+	track, err := lfmclient.GetFirstTrack(user)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// Get the largest non-empty image URL from the end of the list
+	imageURL := ""
+	if len(track.Images) > 0 {
+		for i := len(track.Images) - 1; i >= 0; i-- {
+			if track.Images[i] != "" {
+				imageURL = track.Images[i]
+				break
+			}
+		}
+	}
+
+	tmpl := template.Must(template.ParseFiles("templates/widget.html"))
+
+	var out bytes.Buffer
+	if err := tmpl.Execute(&out, struct {
+		models.Track
+		ImageURL string
+	}{
+		Track:    track,
+		ImageURL: imageURL,
+	}); err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Render error: " + err.Error())
+	}
+
+	c.Type("html", "utf-8")
+	return c.Send(out.Bytes())
 }

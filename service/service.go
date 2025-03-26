@@ -49,6 +49,7 @@ func (s *LastFMService) GetFirstTrack(user string) (models.Track, error) {
 		Name:         firstTrack.Name,
 		Album:        firstTrack.Album.Name,
 		NowPlaying:   isNowPlaying,
+		Images:       utils.ExtractImageUrls(firstTrack.Images),
 		PlayedAt:     playedAt,
 		PlayedAtUnix: playedAtUnix,
 	}, nil

@@ -1,0 +1,18 @@
+{{ if .NowPlaying }}
+  <div>
+    <strong>🎵 Now Playing:</strong> {{ .Name }}<br>
+    👤 {{ .Artist }}<br>
+    💿 {{ .Album }}
+  </div>
+{{ else }}
+  <div>
+    <strong>🕒 Last Played:</strong> {{ .Name }}<br>
+    👤 {{ .Artist }}<br>
+    💿 {{ .Album }}<br>
+    📅 {{ .PlayedAt }}
+  </div>
+{{ end }}
+
+{{ if .ImageURL }}
+  <img src="{{ .ImageURL }}" loading="lazy" alt="Album Cover" style="max-width: 100%;">
+{{ end }}

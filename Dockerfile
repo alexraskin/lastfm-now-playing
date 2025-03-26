@@ -16,14 +16,16 @@ COPY service/ ./service/
 
 COPY utils/ ./utils/
 
+COPY templates/ ./templates/
+
 RUN CGO_ENABLED=0 GOOS=linux go build -o lastfm-api main.go
 
 FROM alpine:latest
 
 WORKDIR /app
 
-# Copy the binary from builder
 COPY --from=builder /app/lastfm-api .
+COPY --from=builder /app/templates ./templates
 
 EXPOSE 3000
 

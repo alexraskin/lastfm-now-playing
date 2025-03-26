@@ -31,6 +31,7 @@ type Track struct {
 	Name         string
 	Album        string
 	NowPlaying   bool
+	Images       []string
 	PlayedAt     string
 	PlayedAtUnix int64
 }
@@ -49,12 +50,13 @@ type ApiDoc struct {
 }
 
 type TrackResponse struct {
-	Track        string `json:"track"`
-	Artist       string `json:"artist"`
-	Album        string `json:"album"`
-	NowPlaying   bool   `json:"nowPlaying"`
-	PlayedAt     string `json:"playedAt,omitempty"`
-	PlayedAtUnix int64  `json:"playedAtUnix,omitempty"`
+	Track        string   `json:"track"`
+	Artist       string   `json:"artist"`
+	Album        string   `json:"album"`
+	NowPlaying   bool     `json:"nowPlaying"`
+	Images       []string `json:"image,omitempty"`
+	PlayedAt     string   `json:"playedAt,omitempty"`
+	PlayedAtUnix int64    `json:"playedAtUnix,omitempty"`
 }
 
 type ShieldsResponse struct {
