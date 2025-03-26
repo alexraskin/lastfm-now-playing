@@ -23,7 +23,7 @@ func main() {
 		RateLimit     int
 		RateLimitTime time.Duration
 	}{
-		Port:          "3500",
+		Port:          "3000",
 		RateLimit:     10,
 		RateLimitTime: 1 * time.Minute,
 	}

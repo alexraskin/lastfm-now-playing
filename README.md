@@ -85,12 +85,13 @@ GET /twizycat?format=shields.io
 #### Glance Widget Format:
 
 ```
-GET /widget/twizycat
+GET /widget
 ```
 ```yaml
 - type: extension
-  url: https://lastfm.alexraskin.com/widget/twizycat
+  url: https://lastfm.alexraskin.com/widget
   allow-potentially-dangerous-html: true
   cache: 30s
-  frameless: true
+  parameters:
+    user: twizycat
 ```
