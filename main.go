@@ -23,7 +23,7 @@ func main() {
 		RateLimit     int
 		RateLimitTime time.Duration
 	}{
-		Port:          "3000",
+		Port:          "3500",
 		RateLimit:     10,
 		RateLimitTime: 1 * time.Minute,
 	}
@@ -84,12 +84,12 @@ func main() {
 
 	app.Get("/", handlers.IndexHandler)
 
-	app.Get("/:user", func(c *fiber.Ctx) error {
-		return handlers.NowPlayingHandler(c, client)
-	})
-
 	app.Get("/widget", func(c *fiber.Ctx) error {
 		return handlers.NowPlayingWidgetHandler(c, client)
+	})
+
+	app.Get("/:user", func(c *fiber.Ctx) error {
+		return handlers.NowPlayingHandler(c, client)
 	})
 
 	log.Fatal(app.Listen(":" + config.Port))
