@@ -80,6 +80,8 @@ func NowPlayingHandler(c *fiber.Ctx, lfmclient *service.LastFMService) error {
 
 func NowPlayingWidgetHandler(c *fiber.Ctx, lfmclient *service.LastFMService) error {
 	user := c.Query("user")
+	fmt.Println("Full query string:", c.OriginalURL())
+	fmt.Println("User:", user)
 	if user == "" {
 		return c.Status(fiber.StatusBadRequest).SendString("Missing 'user' parameter")
 	}
