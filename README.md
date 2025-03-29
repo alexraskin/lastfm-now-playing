@@ -26,10 +26,8 @@ curl -s https://lastfm.alexraskin.com/{your lastfm username}
    go mod download
    ```
 
-3. Set the `LASTFM_API_KEY` environment variable:
-   ```
-   export LASTFM_API_KEY={your lastfm api key}
-   ```
+3. Take a look at the `config.yaml.example` file and create a `config.yaml` file in the root of the project.
+
 
 4. Run the application:
    ```
@@ -44,7 +42,7 @@ curl -s https://lastfm.alexraskin.com/{your lastfm username}
    ```
 2. Run the container:
    ```
-   docker run -p 3000:3000 -e LASTFM_API_KEY={your lastfm api key} lastfm-now-playing
+   docker run -p 8000:8000 -e LASTFM_API_KEY={your lastfm api key} lastfm-now-playing
    ```
 
 ### Get a user's currently playing track
@@ -79,7 +77,7 @@ GET /twizycat
 GET /twizycat?format=shields.io
 ```
 ```
-[![Last.FM Last Played Song](https://img.shields.io/endpoint?color=blueviolet&url=https://playing.alexraskin.com/twizycat?format=shields.io)](https://github.com/alexraskin/lastfm-now-playing)
+[![Last.FM Last Played Song](https://img.shields.io/endpoint?color=blueviolet&url=https://lastfm.alexraskin.com/twizycat?format=shields.io)](https://github.com/alexraskin/lastfm-now-playing)
 ```
 
 #### Glance Widget Format:
