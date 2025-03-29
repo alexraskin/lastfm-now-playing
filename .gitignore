@@ -42,3 +42,6 @@ dist/
 
 # Debug files
 debug 
+
+# Config file
+config.yaml

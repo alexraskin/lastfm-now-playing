@@ -1,10 +1,9 @@
-package service
+package server
 
 import (
+	"errors"
 	"strconv"
 
-	"github.com/alexraskin/lastfm-now-playing/models"
-	"github.com/alexraskin/lastfm-now-playing/utils"
 	"github.com/shkh/lastfm-go/lastfm"
 )
 
@@ -18,14 +17,14 @@ func NewLastFMService(apiKey string) *LastFMService {
 	}
 }
 
-func (s *LastFMService) GetFirstTrack(user string) (models.Track, error) {
+func (s *LastFMService) GetFirstTrack(user string) (Track, error) {
 	recentTracks, err := s.client.User.GetRecentTracks(lastfm.P{"user": user, "limit": "1"})
 	if err != nil {
-		return models.Track{}, utils.LastFMError{Message: err.Error()}
+		return Track{}, errors.New(err.Error())
 	}
 
 	if len(recentTracks.Tracks) == 0 {
-		return models.Track{}, utils.LastFMError{Message: "no tracks found"}
+		return Track{}, errors.New("no tracks found")
 	}
 
 	firstTrack := recentTracks.Tracks[0]
@@ -44,13 +43,24 @@ func (s *LastFMService) GetFirstTrack(user string) (models.Track, error) {
 		}
 	}
 
-	return models.Track{
+	return Track{
 		Artist:       firstTrack.Artist.Name,
 		Name:         firstTrack.Name,
 		Album:        firstTrack.Album.Name,
 		NowPlaying:   isNowPlaying,
-		Images:       utils.ExtractImageUrls(firstTrack.Images),
+		Images:       extractImageUrls(firstTrack.Images),
 		PlayedAt:     playedAt,
 		PlayedAtUnix: playedAtUnix,
 	}, nil
+}
+
+func extractImageUrls(images []struct {
+	Size string `xml:"size,attr"`
+	Url  string `xml:",chardata"`
+}) []string {
+	urls := make([]string, len(images))
+	for i, img := range images {
+		urls[i] = img.Url
+	}
+	return urls
 }

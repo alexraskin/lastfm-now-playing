@@ -1,6 +1,5 @@
-package models
+package server
 
-// LastFMTrack represents the structure of a track from the LastFM API
 type LastFMTrack struct {
 	NowPlaying string `xml:"nowplaying,attr,omitempty"`
 	Artist     struct {
@@ -25,7 +24,6 @@ type LastFMTrack struct {
 	} `xml:"date"`
 }
 
-// Track represents a single track from LastFM
 type Track struct {
 	Artist       string
 	Name         string
@@ -36,14 +34,12 @@ type Track struct {
 	PlayedAtUnix int64
 }
 
-// Endpoint represents a single endpoint in the API
 type Endpoint struct {
 	Method      string `json:"method"`
 	Path        string `json:"path"`
 	Description string `json:"description"`
 }
 
-// ApiDoc represents the API documentation
 type ApiDoc struct {
 	Status    string     `json:"status"`
 	Endpoints []Endpoint `json:"endpoints"`
