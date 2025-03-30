@@ -42,6 +42,7 @@ type Config struct {
 	RateLimitTime string `yaml:"rate_limit_time"`
 }
 
+// needed for docker secrets
 func getLastFMAPIKey() string {
 	envValue := os.Getenv("LASTFM_API_KEY")
 
