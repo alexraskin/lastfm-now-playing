@@ -42,5 +42,5 @@ networks:
     external: true
 
 secrets:
-  LASTFM_API_KEY:
+  lastfm-api-key:
     external: true
