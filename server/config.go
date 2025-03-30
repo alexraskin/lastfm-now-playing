@@ -1,8 +1,10 @@
 package server
 
 import (
+	"log"
 	"log/slog"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -10,7 +12,7 @@ import (
 func defaultConfig() Config {
 	return Config{
 		Port:          "3000",
-		LastFMAPIKey:  os.Getenv("LASTFM_API_KEY"),
+		LastFMAPIKey:  getLastFMAPIKey(),
 		RateLimit:     50,
 		RateLimitTime: "1m",
 	}
@@ -38,4 +40,22 @@ type Config struct {
 	LastFMAPIKey  string `yaml:"lastfm_api_key"`
 	RateLimit     int    `yaml:"rate_limit"`
 	RateLimitTime string `yaml:"rate_limit_time"`
+}
+
+func getLastFMAPIKey() string {
+	envValue := os.Getenv("LASTFM_API_KEY")
+
+	if strings.HasPrefix(envValue, "/") {
+		data, err := os.ReadFile(envValue)
+		if err != nil {
+			log.Fatalf("Failed to read LastFM API key from secret file: %v", err)
+		}
+		return strings.TrimSpace(string(data))
+	}
+
+	if envValue == "" {
+		log.Fatal("LASTFM_API_KEY is not set")
+	}
+
+	return envValue
 }
