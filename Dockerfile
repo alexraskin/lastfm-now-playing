@@ -23,6 +23,6 @@ RUN apk --no-cache add ca-certificates
 
 COPY --from=build /build/lastfm-now-playing /bin/lastfm-now-playing
 
-EXPOSE 8000
+EXPOSE 3000
 
-CMD ["/bin/lastfm-now-playing", "-port", "8000"]
+CMD ["/bin/lastfm-now-playing"]

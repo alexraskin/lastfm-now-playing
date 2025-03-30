@@ -9,9 +9,9 @@ import (
 
 func defaultConfig() Config {
 	return Config{
-		Port:          "8080",
+		Port:          "3000",
 		LastFMAPIKey:  os.Getenv("LASTFM_API_KEY"),
-		RateLimit:     10,
+		RateLimit:     50,
 		RateLimitTime: "1m",
 	}
 }

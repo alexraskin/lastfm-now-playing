@@ -24,7 +24,7 @@ var (
 
 func main() {
 
-	config := server.LoadConfig("config.yaml")
+	config := server.LoadConfig("/etc/lastfm-now-playing/config.yaml")
 
 	slog.Info("Starting lastfm-now-playing...", slog.Any("version", version), slog.Any("commit", commit), slog.Any("buildTime", buildTime))
 
