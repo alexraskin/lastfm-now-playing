@@ -1,11 +1,8 @@
 package server
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"html/template"
-	"io"
 	"net/http"
 	"time"
 
@@ -40,9 +37,9 @@ func (s *Server) Routes() http.Handler {
 	))
 
 	r.Get("/", s.index)
+	r.Get("/version", s.serverVersion)
 	r.Get("/widget", s.nowPlayingWidget)
 	r.Get("/{user}", s.nowPlaying)
-
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Page not found", http.StatusNotFound)
 	})
@@ -75,13 +72,17 @@ func (s *Server) index(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(apiDoc)
 }
 
+func (s *Server) serverVersion(w http.ResponseWriter, _ *http.Request) {
+	_, _ = w.Write([]byte(s.version))
+}
+
 func (s *Server) nowPlaying(w http.ResponseWriter, r *http.Request) {
 	user := chi.URLParam(r, "user")
 	if user == "" {
 		http.Error(w, "User is required", http.StatusBadRequest)
 	}
 
-	track, err := s.lfmclient.GetFirstTrack(user)
+	track, err := s.lfmclient.getFirstTrack(user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -121,7 +122,7 @@ func (s *Server) nowPlayingWidget(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Missing 'user' parameter", http.StatusBadRequest)
 	}
 
-	track, err := s.lfmclient.GetFirstTrack(user)
+	track, err := s.lfmclient.getFirstTrack(user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -137,33 +138,15 @@ func (s *Server) nowPlayingWidget(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	file, err := s.templates.Open("widget.gohtml")
-	if err != nil {
-		http.Error(w, "Template not found: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer file.Close()
-
-	data, err := io.ReadAll(file)
-	if err != nil {
-		http.Error(w, "Failed to read template: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	tmpl, err := template.New("widget").Parse(string(data))
-	if err != nil {
-		http.Error(w, "Failed to parse template: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	var out bytes.Buffer
-	if err := tmpl.Execute(&out, struct {
+	pageData := struct {
 		Track
 		ImageURL string
 	}{
 		Track:    track,
 		ImageURL: imageURL,
-	}); err != nil {
+	}
+
+	if err := s.tmplFunc(w, "widget.gohtml", pageData); err != nil {
 		http.Error(w, "Render error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -171,5 +154,4 @@ func (s *Server) nowPlayingWidget(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Widget-Title", "Last.fm")
 	w.Header().Set("Widget-Content-Type", "html")
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, _ = w.Write(out.Bytes())
 }

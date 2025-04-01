@@ -17,7 +17,7 @@ func NewLastFMService(apiKey string) *LastFMService {
 	}
 }
 
-func (s *LastFMService) GetFirstTrack(user string) (Track, error) {
+func (s *LastFMService) getFirstTrack(user string) (Track, error) {
 	recentTracks, err := s.client.User.GetRecentTracks(lastfm.P{"user": user, "limit": "1"})
 	if err != nil {
 		return Track{}, errors.New(err.Error())

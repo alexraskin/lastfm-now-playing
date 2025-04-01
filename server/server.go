@@ -1,11 +1,9 @@
 package server
 
 import (
-	"embed"
 	"errors"
 	"fmt"
-	"io/fs"
-	"log"
+	"io"
 	"log/slog"
 	"net/http"
 	"os"
@@ -13,25 +11,23 @@ import (
 	"time"
 )
 
+type ExecuteTemplateFunc func(wr io.Writer, name string, data any) error
+
 type Server struct {
 	version    string
 	httpClient *http.Client
 	server     *http.Server
-	templates  http.FileSystem
+	tmplFunc   ExecuteTemplateFunc
 	lfmclient  *LastFMService
 	config     Config
 }
 
-func NewServer(version string, httpClient *http.Client, rawTemplates embed.FS, lfmclient *LastFMService, config Config) *Server {
-	templatesFS, err := fs.Sub(rawTemplates, "templates")
-	if err != nil {
-		log.Fatal(err)
-	}
+func NewServer(version string, httpClient *http.Client, tmplFunc ExecuteTemplateFunc, lfmclient *LastFMService, config Config) *Server {
 
 	s := &Server{
 		version:    version,
 		httpClient: httpClient,
-		templates:  http.FS(templatesFS),
+		tmplFunc:   tmplFunc,
 		lfmclient:  lfmclient,
 		config:     config,
 	}

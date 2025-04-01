@@ -13,9 +13,12 @@ ARG VERSION
 ARG COMMIT
 ARG BUILD_TIME
 
-RUN --mount=type=cache,id=s/ad7afaa9-317d-4b2e-9f70-c68691100497-/root/.cache/go-build,target=/root/.cache/go-build \
-    --mount=type=cache,id=s/ad7afaa9-317d-4b2e-9f70-c68691100497-/go/pkg,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-X 'main.version=$VERSION' -X 'main.commit=$COMMIT' -X 'main.buildTime=$BUILD_TIME'" -o lastfm-now-playing github.com/alexraskin/lastfm-now-playing
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg \
+    CGO_ENABLED=0 \
+    GOOS=$TARGETOS \
+    GOARCH=$TARGETARCH \
+    go build -ldflags="-X 'main.version=$VERSION' -X 'main.commit=$COMMIT' -X 'main.buildTime=$BUILD_TIME'" -o lastfm-now-playing github.com/alexraskin/lastfm-now-playing
 
 FROM alpine
 
@@ -25,4 +28,6 @@ COPY --from=build /build/lastfm-now-playing /bin/lastfm-now-playing
 
 EXPOSE 3000
 
-CMD ["/bin/lastfm-now-playing"]
+ENTRYPOINT ["/bin/lastfm-now-playing"]
+
+CMD ["-port", "3000"]
