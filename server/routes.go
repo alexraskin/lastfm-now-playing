@@ -146,12 +146,12 @@ func (s *Server) nowPlayingWidget(w http.ResponseWriter, r *http.Request) {
 		ImageURL: imageURL,
 	}
 
+	w.Header().Set("Widget-Title", "Last.fm")
+	w.Header().Set("Widget-Content-Type", "html")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
 	if err := s.tmplFunc(w, "widget.gohtml", pageData); err != nil {
 		http.Error(w, "Render error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	w.Header().Set("Widget-Title", "Last.fm")
-	w.Header().Set("Widget-Content-Type", "html")
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 }
