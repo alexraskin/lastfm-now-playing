@@ -50,4 +50,4 @@ jobs:
           url: "https://swarmctl.alexraskin.com/v1/update/lastfm_api?image=ghcr.io/alexraskin/lastfm-now-playing:${{ github.sha }}"
           method: "POST"
           timeout: 60000
-          customHeaders: '{"Authorization": "${{ secrets.AUTH_TOKEN }}"}'
+          customHeaders: '{"Authorization": "Bearer ${{ secrets.AUTH_TOKEN }}"}'
