@@ -4,6 +4,8 @@ A simple API that fetches the currently playing or most recently played track fr
 
 [![Image from Gyazo](https://i.gyazo.com/5632a2462e3cee91a25d1824a45f318d.png)](https://gyazo.com/5632a2462e3cee91a25d1824a45f318d)
 
+[![Last.FM Last Played Song](https://img.shields.io/endpoint?color=blueviolet&url=https://lastfm.alexraskin.com/alexraskin?format=shields.io)](https://github.com/alexraskin/lastfm-now-playing)
+
 ```bash
 curl -s https://lastfm.alexraskin.com/{your lastfm username}
 ```
