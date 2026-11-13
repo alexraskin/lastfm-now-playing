@@ -2,16 +2,13 @@ package main
 
 import (
 	"embed"
-	"flag"
 	"html/template"
-	"io"
 	"log/slog"
-	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/alexraskin/lastfm-now-playing/server"
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/awslabs/aws-lambda-go-api-proxy/httpadapter"
 )
 
 var (
@@ -26,54 +23,22 @@ var (
 )
 
 func main() {
-
-	port := flag.String("port", "3000", "port to listen on")
-	devMode := flag.Bool("dev", false, "run in dev mode")
-	configPath := flag.String("config", "", "path to config file")
-	flag.Parse()
-
-	config := server.LoadConfig(*configPath)
-	config.Port = *port
-
-	var (
-		tmplFunc server.ExecuteTemplateFunc
-	)
-
 	slog.Info("Starting lastfm-now-playing...", slog.Any("version", version), slog.Any("commit", commit), slog.Any("buildTime", buildTime))
 
-	if *devMode {
-		slog.Info("running in dev mode")
-		tmplFunc = func(wr io.Writer, name string, data any) error {
-			tmpl, err := template.New("").ParseGlob("templates/*.gohtml")
-			if err != nil {
-				return err
-			}
-			return tmpl.ExecuteTemplate(wr, name, data)
-		}
-	} else {
-		tmpl, err := template.New("").ParseFS(Templates, "templates/*.gohtml")
-		if err != nil {
-			slog.Error("failed to parse templates", slog.Any("error", err))
-			os.Exit(-1)
-		}
-		tmplFunc = tmpl.ExecuteTemplate
+	tmpl, err := template.New("").ParseFS(Templates, "templates/*.gohtml")
+	if err != nil {
+		slog.Error("failed to parse templates", slog.Any("error", err))
+		os.Exit(-1)
 	}
 
-	client := server.NewLastFMService(config.LastFMAPIKey)
+	client := server.NewLastFMService(server.LoadLastFMAPIKey())
 
 	server := server.NewServer(
 		server.FormatBuildVersion(version, commit, buildTime),
-		http.DefaultClient,
-		tmplFunc,
+		tmpl.ExecuteTemplate,
 		client,
-		config,
 	)
 
-	go server.Start()
-	defer server.Close()
-
-	slog.Info("started lastfm-now-playing", slog.Any("listen_addr", config.Port))
-	si := make(chan os.Signal, 1)
-	signal.Notify(si, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
-	<-si
+	// Function URLs use the API Gateway v2 payload format.
+	lambda.Start(httpadapter.NewV2(server.Routes()).ProxyWithContext)
 }

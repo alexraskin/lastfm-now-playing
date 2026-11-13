@@ -1,62 +1,35 @@
 package server
 
 import (
+	"context"
 	"log"
-	"log/slog"
 	"os"
 	"strings"
 
-	"gopkg.in/yaml.v2"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/ssm"
 )
 
-func defaultConfig() Config {
-	return Config{
-		Port:          "3000",
-		LastFMAPIKey:  getLastFMAPIKey(),
-		RateLimit:     50,
-		RateLimitTime: "1m",
+func LoadLastFMAPIKey() string {
+	name := os.Getenv("LASTFM_API_KEY_SSM_PARAMETER")
+	if name == "" {
+		log.Fatal("LASTFM_API_KEY_SSM_PARAMETER is not set")
 	}
-}
 
-func LoadConfig(path string) Config {
-	file, err := os.Open(path)
+	ctx := context.Background()
+	cfg, err := awsconfig.LoadDefaultConfig(ctx)
 	if err != nil {
-		slog.Error("Failed to open config file", slog.Any("err", err))
-		slog.Info("Using default config")
-		return defaultConfig()
+		log.Fatalf("Failed to load AWS config: %v", err)
 	}
 
-	var cfg Config
-	if err = yaml.NewDecoder(file).Decode(&cfg); err != nil {
-		slog.Error("Failed to decode config file", slog.Any("err", err))
-		slog.Info("Using default config")
-		return defaultConfig()
-	}
-	return cfg
-}
-
-type Config struct {
-	Port          string `yaml:"port"`
-	LastFMAPIKey  string `yaml:"lastfm_api_key"`
-	RateLimit     int    `yaml:"rate_limit"`
-	RateLimitTime string `yaml:"rate_limit_time"`
-}
-
-// needed for docker secrets
-func getLastFMAPIKey() string {
-	envValue := os.Getenv("LASTFM_API_KEY")
-
-	if strings.HasPrefix(envValue, "/") {
-		data, err := os.ReadFile(envValue)
-		if err != nil {
-			log.Fatalf("Failed to read LastFM API key from secret file: %v", err)
-		}
-		return strings.TrimSpace(string(data))
+	out, err := ssm.NewFromConfig(cfg).GetParameter(ctx, &ssm.GetParameterInput{
+		Name:           aws.String(name),
+		WithDecryption: aws.Bool(true),
+	})
+	if err != nil {
+		log.Fatalf("Failed to read LastFM API key from SSM parameter %s: %v", name, err)
 	}
 
-	if envValue == "" {
-		log.Fatal("LASTFM_API_KEY is not set")
-	}
-
-	return envValue
+	return strings.TrimSpace(aws.ToString(out.Parameter.Value))
 }

@@ -10,41 +10,7 @@ A simple API that fetches the currently playing or most recently played track fr
 curl -s https://lastfm.alexraskin.com/{your lastfm username}
 ```
 
-## Setup
-
-- Go 1.24 or later
-- Last.fm API key (get one from [Last.fm API](https://www.last.fm/api/))
-
-### Local Dev
-
-1. Clone this repository
-   ```
-   git clone https://github.com/alexraskin/lastfm-now-playing.git
-   ```
-
-2. Install dependencies:
-   ```
-   go mod download
-   ```
-
-3. Take a look at the `config.yaml.example` file and create a `config.yaml` file in the root of the project.
-
-
-4. Run the application:
-   ```
-   go run main.go
-   ```
-
-### Docker
-
-1. Build the Docker image:
-   ```
-   docker build -t lastfm-now-playing .
-   ```
-2. Run the container:
-   ```
-   docker run -p 8000:8000 -e LASTFM_API_KEY={your lastfm api key} lastfm-now-playing
-   ```
+## Usage
 
 ### Get a user's currently playing track
 
@@ -57,9 +23,9 @@ Example:
 GET /twizycat
 ```
 
-### Response Formats
+### Response formats
 
-#### Default JSON response:
+#### JSON (default)
 
 ```json
 {
@@ -72,7 +38,7 @@ GET /twizycat
 }
 ```
 
-#### Shields.io Format:
+#### Shields.io
 
 ```
 GET /twizycat?format=shields.io
@@ -81,7 +47,7 @@ GET /twizycat?format=shields.io
 [![Last.FM Last Played Song](https://img.shields.io/endpoint?color=blueviolet&url=https://lastfm.alexraskin.com/twizycat?format=shields.io)](https://github.com/alexraskin/lastfm-now-playing)
 ```
 
-#### Glance Widget Format:
+#### Glance widget
 
 ```
 GET /widget
@@ -94,3 +60,58 @@ GET /widget
   parameters:
     user: twizycat
 ```
+
+## Self-hosting
+
+The API runs on AWS Lambda (`provided.al2023`, arm64) behind an API Gateway HTTP API, with a custom domain on Cloudflare DNS. Everything is deployed with Terraform.
+
+### Requirements
+
+- [mise](https://mise.jdx.dev), which installs the pinned Go and Terraform versions from `mise.toml`
+- An AWS account and a Cloudflare zone
+- A Last.fm API key from [last.fm/api](https://www.last.fm/api/). Only the API key is used, not the shared secret.
+
+### Layout
+
+```
+terraform/                  root stack
+  modules/lambda-function/  Lambda + SSM parameter for the Last.fm API key
+  modules/http-api/         API Gateway + ACM certificate + Cloudflare DNS
+  modules/github-oidc/      IAM role GitHub Actions deploys with
+```
+
+### Configuration
+
+Before deploying a fork, change these to match your own setup:
+
+- The `backend "s3"` block in `terraform/versions.tf`, which holds the state bucket
+- In `terraform/variables.tf`:
+  - `domain_name` and `cloudflare_zone`
+  - `github_repository`
+  - `state_bucket`
+  - `cloudflare_api_token_parameter`: the SSM `SecureString` that holds a Cloudflare API token with `Zone:Read` and `DNS:Edit`
+  - `create_oidc_provider`: set it to `true` if your account doesn't have the GitHub OIDC provider yet
+
+In Cloudflare, set the zone's SSL/TLS mode to **Full (strict)**, because API Gateway only serves HTTPS.
+
+### Deploy
+
+1. Run the first apply locally with your own AWS credentials:
+   ```
+   mise install
+   mise run deploy   # builds dist/lambda.zip and applies terraform/
+   ```
+
+2. Set the Last.fm API key. Terraform creates the parameter with a placeholder value and ignores later changes to it:
+   ```
+   aws ssm put-parameter --name /lastfm-now-playing/lastfm-api-key --type SecureString --overwrite --value <your api key>
+   ```
+   Lambda environments that are already running keep the cached key until they're recycled.
+
+3. Optionally, let GitHub Actions deploy every push to `main`. It assumes the deploy role over OIDC, so no AWS keys are stored in GitHub:
+   ```
+   gh variable set AWS_ROLE_ARN --body "$(terraform -chdir=terraform output -raw deploy_role_arn)"
+   ```
+   The deploy role can't modify itself, so changes to `modules/github-oidc` have to be applied locally.
+
+Requests are capped by API Gateway throttling (10 req/s, burst 20) and Lambda reserved concurrency (5). Both settings are variables in `terraform/variables.tf`.

@@ -1,0 +1,29 @@
+[tools]
+go = "1.27.3"
+terraform = "1.16.7"
+
+[env]
+CGO_ENABLED = "0"
+
+[tasks.package]
+description = "Build the Lambda bootstrap binary and zip it into dist/lambda.zip"
+env = { GOOS = "linux", GOARCH = "arm64" }
+run = """
+set -eu
+mkdir -p dist
+go build -trimpath -tags lambda.norpc \
+  -ldflags="-s -w -X 'main.version=${VERSION:-dev}' -X 'main.commit=${COMMIT:-unknown}' -X 'main.buildTime=${BUILD_TIME:-unknown}'" \
+  -o dist/bootstrap .
+rm -f dist/lambda.zip
+(cd dist && zip -q lambda.zip bootstrap)
+"""
+
+[tasks.deploy]
+description = "Package and apply the Terraform stack (needs AWS credentials)"
+depends = ["package"]
+dir = "terraform"
+run = """
+set -eu
+terraform init -input=false
+terraform apply -input=false -auto-approve
+"""

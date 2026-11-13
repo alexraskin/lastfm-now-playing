@@ -30,9 +30,6 @@ go.work
 # Log files
 *.log
 
-# Docker build files
-docker-compose.override.yml
-
 # Dependencies
 vendor/
 
@@ -41,7 +38,11 @@ bin/
 dist/
 
 # Debug files
-debug 
+debug
 
-# Config file
-config.yaml
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan

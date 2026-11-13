@@ -4,12 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
-	"github.com/go-chi/httprate"
 )
 
 func (s *Server) Routes() http.Handler {
@@ -25,16 +23,6 @@ func (s *Server) Routes() http.Handler {
 		AllowedHeaders: []string{"Origin, Content-Type, Accept"},
 		AllowedMethods: []string{"GET", "OPTIONS"},
 	}))
-
-	r.Use(httprate.Limit(
-		100,
-		time.Minute,
-		httprate.WithLimitHandler(
-			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				http.Error(w, "Too many requests", http.StatusTooManyRequests)
-			}),
-		),
-	))
 
 	r.Get("/", s.index)
 	r.Get("/version", s.serverVersion)

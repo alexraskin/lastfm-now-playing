@@ -1,12 +1,8 @@
 package server
 
 import (
-	"errors"
 	"fmt"
 	"io"
-	"log/slog"
-	"net/http"
-	"os"
 	"runtime"
 	"time"
 )
@@ -14,42 +10,16 @@ import (
 type ExecuteTemplateFunc func(wr io.Writer, name string, data any) error
 
 type Server struct {
-	version    string
-	httpClient *http.Client
-	server     *http.Server
-	tmplFunc   ExecuteTemplateFunc
-	lfmclient  *LastFMService
-	config     Config
+	version   string
+	tmplFunc  ExecuteTemplateFunc
+	lfmclient *LastFMService
 }
 
-func NewServer(version string, httpClient *http.Client, tmplFunc ExecuteTemplateFunc, lfmclient *LastFMService, config Config) *Server {
-
-	s := &Server{
-		version:    version,
-		httpClient: httpClient,
-		tmplFunc:   tmplFunc,
-		lfmclient:  lfmclient,
-		config:     config,
-	}
-
-	s.server = &http.Server{
-		Addr:    ":" + config.Port,
-		Handler: s.Routes(),
-	}
-
-	return s
-}
-
-func (s *Server) Start() {
-	if err := s.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		slog.Error("Error while listening", slog.Any("err", err))
-		os.Exit(-1)
-	}
-}
-
-func (s *Server) Close() {
-	if err := s.server.Close(); err != nil {
-		slog.Error("Error while closing server", slog.Any("err", err))
+func NewServer(version string, tmplFunc ExecuteTemplateFunc, lfmclient *LastFMService) *Server {
+	return &Server{
+		version:   version,
+		tmplFunc:  tmplFunc,
+		lfmclient: lfmclient,
 	}
 }
 
