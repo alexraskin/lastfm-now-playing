@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -68,11 +69,12 @@ func (s *Server) nowPlaying(w http.ResponseWriter, r *http.Request) {
 	user := chi.URLParam(r, "user")
 	if user == "" {
 		http.Error(w, "User is required", http.StatusBadRequest)
+		return
 	}
 
 	track, err := s.lfmclient.getFirstTrack(user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		trackError(w, err)
 		return
 	}
 
@@ -108,11 +110,12 @@ func (s *Server) nowPlayingWidget(w http.ResponseWriter, r *http.Request) {
 	user := r.URL.Query().Get("user")
 	if user == "" {
 		http.Error(w, "Missing 'user' parameter", http.StatusBadRequest)
+		return
 	}
 
 	track, err := s.lfmclient.getFirstTrack(user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		trackError(w, err)
 		return
 	}
 
@@ -141,5 +144,14 @@ func (s *Server) nowPlayingWidget(w http.ResponseWriter, r *http.Request) {
 	if err := s.tmplFunc(w, "widget.gohtml", pageData); err != nil {
 		http.Error(w, "Render error: "+err.Error(), http.StatusInternalServerError)
 		return
+	}
+}
+
+func trackError(w http.ResponseWriter, err error) {
+	switch {
+	case errors.Is(err, ErrUserNotFound), errors.Is(err, ErrNoTracks):
+		http.Error(w, err.Error(), http.StatusNotFound)
+	default:
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

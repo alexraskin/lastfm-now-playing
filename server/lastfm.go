@@ -7,6 +7,14 @@ import (
 	"github.com/shkh/lastfm-go/lastfm"
 )
 
+// Last.fm API error code for an unknown user.
+const lastfmInvalidParameters = 6
+
+var (
+	ErrUserNotFound = errors.New("user not found")
+	ErrNoTracks     = errors.New("no tracks found")
+)
+
 type LastFMService struct {
 	client *lastfm.Api
 }
@@ -20,11 +28,15 @@ func NewLastFMService(apiKey string) *LastFMService {
 func (s *LastFMService) getFirstTrack(user string) (Track, error) {
 	recentTracks, err := s.client.User.GetRecentTracks(lastfm.P{"user": user, "limit": "1"})
 	if err != nil {
-		return Track{}, errors.New(err.Error())
+		var lfmErr *lastfm.LastfmError
+		if errors.As(err, &lfmErr) && lfmErr.Code == lastfmInvalidParameters {
+			return Track{}, ErrUserNotFound
+		}
+		return Track{}, err
 	}
 
 	if len(recentTracks.Tracks) == 0 {
-		return Track{}, errors.New("no tracks found")
+		return Track{}, ErrNoTracks
 	}
 
 	firstTrack := recentTracks.Tracks[0]
