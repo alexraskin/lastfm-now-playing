@@ -1,5 +1,9 @@
 # Last.fm Now Playing
 
+<p align="center">
+  <img src=".github/assets/gopher.png" alt="Go gopher wearing headphones" width="200">
+</p>
+
 A simple API that fetches the currently playing or most recently played track from Last.fm for a given user.
 
 [![Image from Gyazo](https://i.gyazo.com/5632a2462e3cee91a25d1824a45f318d.png)](https://gyazo.com/5632a2462e3cee91a25d1824a45f318d)
